@@ -27,6 +27,7 @@
       --primary-hover: #1864ab;
       --danger: #e03131;
       --success: #2b8a3e;
+      --warning: #f59f00;
       --gray-bg: #f8f9fa;
       --border: #dee2e6;
       --text-main: #212529;
@@ -50,9 +51,7 @@
       display: flex; align-items: center; justify-content: space-between; list-style: none; user-select: none;
     }
     details.guide-card summary::-webkit-details-marker { display: none; }
-    details.guide-card summary::after {
-      content: '펼치기 ▼'; font-size: 0.75rem; font-weight: 700; color: #1971c2;
-    }
+    details.guide-card summary::after { content: '펼치기 ▼'; font-size: 0.75rem; font-weight: 700; color: #1971c2; }
     details.guide-card[open] summary::after { content: '접기 ▲'; }
     details.guide-card[open] summary { border-bottom: 1px dashed #c8e1fb; }
     .guide-content { padding: 10px 14px; }
@@ -62,7 +61,10 @@
     .guide-sub { margin: 3px 0 0; padding-left: 14px; list-style-type: circle; color: #495057; }
 
     /* 입력 폼 카드 */
-    .input-card { background: var(--gray-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 16px; }
+    .input-card { background: var(--gray-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 16px; transition: border-color 0.2s; }
+    .input-card.edit-mode { border: 2px solid var(--warning); background: #fffdf5; }
+    .edit-banner { display: none; background: #fff3bf; color: #d9480f; padding: 6px 10px; border-radius: 6px; font-size: 0.82rem; font-weight: 800; margin-bottom: 10px; text-align: center; }
+
     .form-group { margin-bottom: 12px; }
     .form-group:last-child { margin-bottom: 0; }
     .form-label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; }
@@ -83,8 +85,21 @@
     }
     button:active { transform: scale(0.98); }
     .btn-save { background: var(--primary); color: #fff; width: 100%; font-size: 1rem; }
+    .btn-update { background: var(--warning); color: #212529; width: 100%; font-size: 1rem; font-weight: 800; }
+    .btn-cancel { background: #adb5bd; color: #fff; height: 38px; }
     .btn-print { background: var(--success); color: #fff; }
     .btn-export { background: #495057; color: #fff; }
+
+    /* 기간 필터 바 */
+    .filter-wrap {
+      display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px;
+    }
+    .btn-filter {
+      flex: 1; min-width: 65px; height: 34px; background: #e9ecef; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #495057;
+    }
+    .btn-filter.active {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+    }
 
     /* 요약 카드 그리드 */
     .summary-grid {
@@ -103,22 +118,24 @@
 
     /* 테이블 영역 */
     .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: 8px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 580px; background: #fff; }
-    th, td { border-bottom: 1px solid var(--border); border-right: 1px solid #f1f3f5; padding: 10px 6px; text-align: center; white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 620px; background: #fff; }
+    th, td { border-bottom: 1px solid var(--border); border-right: 1px solid #f1f3f5; padding: 9px 5px; text-align: center; white-space: nowrap; }
     th:last-child, td:last-child { border-right: none; }
     th { background: #f1f3f5; color: #495057; font-weight: 700; }
     tbody tr:last-child td { border-bottom: none; }
     
     .badge-warn { color: #fff; font-weight: 700; background: var(--danger); padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; }
     .badge-ok { color: var(--success); font-weight: 700; background: #ebfbee; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; }
-    .btn-del { background: #f8f9fa; border: 1px solid #ced4da; color: #868e96; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; height: auto; }
-    .btn-del:active { background: #ffe3e3; color: var(--danger); border-color: var(--danger); }
+    
+    .action-btn-group { display: flex; gap: 4px; justify-content: center; }
+    .btn-edit { background: #e7f5ff; border: 1px solid #a5d8ff; color: #1971c2; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; height: auto; }
+    .btn-del { background: #fff5f5; border: 1px solid #ffc9c9; color: var(--danger); padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; height: auto; }
 
     /* 인쇄 및 PDF 저장 전용 스타일 */
     @media print {
       body { background: #fff; padding: 0; color: #000; }
       .container { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
-      .input-card, .btn-main-wrap, .btn-del, .no-print { display: none !important; }
+      .input-card, .btn-main-wrap, .filter-wrap, .btn-edit, .btn-del, .no-print { display: none !important; }
       h1 { font-size: 1.5rem; margin-bottom: 4px; }
       .subtitle { margin-bottom: 10px; }
       details.guide-card { border: 1px solid #666; background: #fcfcfc; margin-bottom: 10px; font-size: 8pt; display: block !important; }
@@ -166,8 +183,11 @@
     </div>
   </details>
 
-  <!-- 입력 폼 -->
-  <div class="input-card">
+  <!-- 입력 및 수정 폼 -->
+  <div class="input-card" id="inputCard">
+    <div class="edit-banner" id="editBanner">✏️ 선택한 기록을 수정하는 중입니다.</div>
+    <input type="hidden" id="editId" value="">
+
     <div class="form-group grid-2">
       <div>
         <label class="form-label">측정 일자</label>
@@ -210,7 +230,8 @@
     </div>
 
     <div class="btn-main-wrap">
-      <button class="btn-save" onclick="saveRecord()">기록 저장하기</button>
+      <button class="btn-save" id="btnSubmit" onclick="handleSubmit()">기록 저장하기</button>
+      <button class="btn-cancel" id="btnCancelEdit" style="display:none;" onclick="cancelEdit()">수정 취소</button>
       <div class="btn-sub-wrap">
         <button class="btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
         <button class="btn-export" onclick="exportCSV()">CSV 내보내기</button>
@@ -218,10 +239,18 @@
     </div>
   </div>
 
-  <!-- 통계 요약 -->
+  <!-- 기간 필터 버튼 바 -->
+  <div class="filter-wrap no-print">
+    <button class="btn-filter" id="filter7" onclick="setFilter(7)">최근 7일</button>
+    <button class="btn-filter" id="filter14" onclick="setFilter(14)">최근 14일</button>
+    <button class="btn-filter" id="filter30" onclick="setFilter(30)">최근 30일</button>
+    <button class="btn-filter active" id="filterAll" onclick="setFilter('all')">전체</button>
+  </div>
+
+  <!-- 통계 요약 (필터 연동) -->
   <div class="summary-grid">
     <div class="summary-item">
-      <span class="summary-label">총 기록</span>
+      <span class="summary-label">선택 기간 기록</span>
       <span class="summary-val" id="totalCount">0건</span>
     </div>
     <div class="summary-item">
@@ -234,9 +263,9 @@
     </div>
   </div>
 
-  <!-- 혈압 추이 차트 -->
+  <!-- 혈압 추이 차트 (필터 연동) -->
   <div class="chart-card" id="chartCard">
-    <div class="chart-header">📈 아침 / 저녁 혈압 추이 (최근 14회차)</div>
+    <div class="chart-header" id="chartTitle">📈 혈압 추이</div>
     <div class="chart-container">
       <canvas id="bpChart"></canvas>
     </div>
@@ -266,23 +295,49 @@
 <script>
   const STORAGE_KEY = 'home_bp_records_v1';
   let chartInstance = null;
+  let currentFilter = 'all'; // 7, 14, 30, 'all'
 
   window.onload = function() {
+    resetDateToToday();
+    renderAll();
+  };
+
+  function resetDateToToday() {
     const today = new Date();
     const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
     document.getElementById('date').value = localDate;
-    
     const hours = today.getHours();
     document.getElementById('period').value = (hours >= 4 && hours < 12) ? '아침' : '저녁';
-    
-    renderRecords();
-  };
+  }
 
   function getRecords() {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   }
 
-  function saveRecord() {
+  function setFilter(days) {
+    currentFilter = days;
+    document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+    if (days === 7) document.getElementById('filter7').classList.add('active');
+    else if (days === 14) document.getElementById('filter14').classList.add('active');
+    else if (days === 30) document.getElementById('filter30').classList.add('active');
+    else document.getElementById('filterAll').classList.add('active');
+    
+    renderAll();
+  }
+
+  function getFilteredRecords() {
+    const records = getRecords();
+    if (currentFilter === 'all') return records;
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - currentFilter);
+    const cutoffStr = cutoffDate.toISOString().split('T')[0];
+
+    return records.filter(r => r.date >= cutoffStr);
+  }
+
+  function handleSubmit() {
+    const editId = document.getElementById('editId').value;
     const date = document.getElementById('date').value;
     const period = document.getElementById('period').value;
     const s1 = parseInt(document.getElementById('sys1').value);
@@ -300,48 +355,116 @@
     const avgSys = isNaN(s2) ? s1 : Math.round((s1 + s2) / 2);
     const avgDia = isNaN(d2) ? d1 : Math.round((d1 + d2) / 2);
 
-    const record = {
-      id: Date.now(),
-      date,
-      period,
-      sys1: s1, dia1: d1,
-      sys2: isNaN(s2) ? '-' : s2,
-      dia2: isNaN(d2) ? '-' : d2,
-      avgSys, avgDia,
-      pulse,
-      memo
-    };
+    let records = getRecords();
 
-    const records = getRecords();
-    records.push(record);
+    if (editId) {
+      // 수정 모드
+      const index = records.findIndex(r => r.id === parseInt(editId));
+      if (index !== -1) {
+        records[index] = {
+          id: parseInt(editId),
+          date,
+          period,
+          sys1: s1, dia1: d1,
+          sys2: isNaN(s2) ? '-' : s2,
+          dia2: isNaN(d2) ? '-' : d2,
+          avgSys, avgDia,
+          pulse,
+          memo
+        };
+      }
+      cancelEdit();
+    } else {
+      // 신규 등록 모드
+      const record = {
+        id: Date.now(),
+        date,
+        period,
+        sys1: s1, dia1: d1,
+        sys2: isNaN(s2) ? '-' : s2,
+        dia2: isNaN(d2) ? '-' : d2,
+        avgSys, avgDia,
+        pulse,
+        memo
+      };
+      records.push(record);
+      clearForm();
+    }
+
     records.sort((a, b) => new Date(b.date) - new Date(a.date));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    renderAll();
+  }
 
-    // 폼 초기화
+  function startEdit(id) {
+    const records = getRecords();
+    const record = records.find(r => r.id === id);
+    if (!record) return;
+
+    document.getElementById('editId').value = record.id;
+    document.getElementById('date').value = record.date;
+    document.getElementById('period').value = record.period;
+    document.getElementById('sys1').value = record.sys1;
+    document.getElementById('dia1').value = record.dia1;
+    document.getElementById('sys2').value = record.sys2 === '-' ? '' : record.sys2;
+    document.getElementById('dia2').value = record.dia2 === '-' ? '' : record.dia2;
+    document.getElementById('pulse').value = record.pulse ? record.pulse : '';
+    document.getElementById('memo').value = record.memo;
+
+    document.getElementById('inputCard').classList.add('edit-mode');
+    document.getElementById('editBanner').style.display = 'block';
+    
+    const submitBtn = document.getElementById('btnSubmit');
+    submitBtn.innerText = '수정 완료하기';
+    submitBtn.className = 'btn-update';
+    document.getElementById('btnCancelEdit').style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    clearForm();
+    document.getElementById('editId').value = '';
+    document.getElementById('inputCard').classList.remove('edit-mode');
+    document.getElementById('editBanner').style.display = 'none';
+
+    const submitBtn = document.getElementById('btnSubmit');
+    submitBtn.innerText = '기록 저장하기';
+    submitBtn.className = 'btn-save';
+    document.getElementById('btnCancelEdit').style.display = 'none';
+
+    resetDateToToday();
+  }
+
+  function clearForm() {
     document.getElementById('sys1').value = '';
     document.getElementById('dia1').value = '';
     document.getElementById('sys2').value = '';
     document.getElementById('dia2').value = '';
     document.getElementById('pulse').value = '';
     document.getElementById('memo').value = '';
-
-    renderRecords();
   }
 
   function deleteRecord(id) {
-    if (!confirm('이 기록을 삭제하시겠습니까?')) return;
+    if (!confirm('이 혈압 측정 기록을 삭제하시겠습니까?')) return;
     let records = getRecords().filter(r => r.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-    renderRecords();
+    if (document.getElementById('editId').value === String(id)) {
+      cancelEdit();
+    }
+    renderAll();
   }
 
-  function renderRecords() {
-    const records = getRecords();
+  function renderAll() {
+    const filtered = getFilteredRecords();
     const tbody = document.getElementById('recordBody');
     tbody.innerHTML = '';
 
-    if (records.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="padding:24px; color:#868e96; white-space:normal;">저장된 측정 데이터가 없습니다.</td></tr>';
+    const filterName = currentFilter === 'all' ? '전체' : `최근 ${currentFilter}일`;
+    document.getElementById('chartTitle').innerText = `📈 혈압 추이 (${filterName})`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:24px; color:#868e96; white-space:normal;">해당 기간에 저장된 데이터가 없습니다.</td></tr>';
       document.getElementById('totalCount').innerText = '0건';
       document.getElementById('avgBP').innerText = '- / -';
       document.getElementById('avgPulse').innerText = '- bpm';
@@ -353,7 +476,7 @@
 
     let sumSys = 0, sumDia = 0, sumPulse = 0, validPulseCount = 0;
 
-    records.forEach(r => {
+    filtered.forEach(r => {
       sumSys += r.avgSys;
       sumDia += r.avgDia;
       if (r.pulse > 0) {
@@ -375,23 +498,27 @@
         <td style="font-weight:700;">${r.avgSys}/${r.avgDia}</td>
         <td>${r.pulse ? `${r.pulse}` : '-'}</td>
         <td>${statusHtml}</td>
-        <td style="text-align:left; max-width:120px; overflow:hidden; text-overflow:ellipsis;">${r.memo || '-'}</td>
-        <td class="no-print"><button class="btn-del" onclick="deleteRecord(${r.id})">삭제</button></td>
+        <td style="text-align:left; max-width:110px; overflow:hidden; text-overflow:ellipsis;">${r.memo || '-'}</td>
+        <td class="no-print">
+          <div class="action-btn-group">
+            <button class="btn-edit" onclick="startEdit(${r.id})">수정</button>
+            <button class="btn-del" onclick="deleteRecord(${r.id})">삭제</button>
+          </div>
+        </td>
       `;
       tbody.appendChild(tr);
     });
 
-    const total = records.length;
+    const total = filtered.length;
     document.getElementById('totalCount').innerText = `${total}건`;
     document.getElementById('avgBP').innerText = `${Math.round(sumSys / total)} / ${Math.round(sumDia / total)}`;
     document.getElementById('avgPulse').innerText = validPulseCount ? `${Math.round(sumPulse / validPulseCount)} bpm` : '-';
 
-    updateChart(records);
+    updateChart(filtered);
   }
 
   function updateChart(records) {
-    // 차트는 시간순(과거 -> 최신) 정렬, 최근 최대 14개 데이터
-    const chronological = [...records].reverse().slice(-14);
+    const chronological = [...records].reverse();
 
     const labels = chronological.map(r => `${r.date.slice(5)} (${r.period === '아침' ? '조' : '석'})`);
     const morningSys = chronological.map(r => r.period === '아침' ? r.avgSys : null);
@@ -478,7 +605,6 @@
             ticks: { stepSize: 20, font: { size: 10 } },
             grid: {
               color: function(context) {
-                // 고혈압 기준선(135 mmHg, 85 mmHg)에 붉은색 점선 표시
                 if (context.tick.value === 135 || context.tick.value === 85) {
                   return 'rgba(224, 49, 49, 0.4)';
                 }
@@ -496,7 +622,7 @@
   }
 
   function exportCSV() {
-    const records = getRecords();
+    const records = getFilteredRecords();
     if (!records.length) return alert('내보낼 데이터가 없습니다.');
     
     let csv = '\uFEFF날짜,시점,1차수축,1차이완,2차수축,2차이완,평균수축,평균이완,맥박,특이사항\n';
