@@ -1,63 +1,91 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<!-- 앱 제목 및 모바일 전체화면 설정 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>가정 혈압 측정 기록부</title>
+
+  <!-- 스마트폰 전체화면 및 앱 설정 -->
   <meta name="apple-mobile-web-app-title" content="혈압기록">
   <meta name="application-name" content="혈압기록">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#1971c2">
-
   <link rel="manifest" href="manifest.json">
 
-  <!-- 브라우저 탭 아이콘 (SVG 파비콘) -->
+  <!-- 앱 아이콘 -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231971c2'/><path d='M50 78 C25 55 15 42 15 28 A18 18 0 0 1 50 20 A18 18 0 0 1 85 28 C85 42 75 55 50 78 Z' fill='%23ffffff'/><path d='M28 35 L40 35 L46 25 L54 45 L60 35 L72 35' fill='none' stroke='%23e03131' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-
-  <!-- 아이폰/아이패드 홈 화면 바로가기 아이콘 (Apple Touch Icon) -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%231971c2'/><path d='M90 140 C45 100 27 76 27 50 A32 32 0 0 1 90 36 A32 32 0 0 1 153 50 C153 76 135 100 90 140 Z' fill='%23ffffff'/><path d='M50 63 L72 63 L83 45 L97 81 L108 63 L130 63' fill='none' stroke='%23e03131' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>가정 혈압 측정 기록부</title>
+
   <style>
     :root {
       --primary: #1971c2;
+      --primary-hover: #1864ab;
       --danger: #e03131;
+      --success: #2b8a3e;
       --gray-bg: #f8f9fa;
-      --border: #ced4da;
+      --border: #dee2e6;
+      --text-main: #212529;
+      --text-sub: #495057;
     }
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; }
-    body { margin: 0; padding: 20px; background: #e9ecef; color: #333; }
-    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 12px; background: #edf2f7; color: var(--text-main); }
+    .container { max-width: 760px; margin: 0 auto; background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
     
-    h1 { margin-top: 0; font-size: 1.4rem; text-align: center; color: #212529; }
-    .subtitle { text-align: center; color: #6c757d; font-size: 0.85rem; margin-bottom: 20px; }
+    /* 제목 */
+    h1 { margin: 4px 0 6px; font-size: 1.35rem; text-align: center; font-weight: 800; color: #111; }
+    .subtitle { text-align: center; color: #868e96; font-size: 0.8rem; margin-bottom: 16px; line-height: 1.3; }
 
-    /* 입력 영역 (화면 전용) */
-    .input-card { background: var(--gray-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; }
-    .row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-    .col { flex: 1; min-width: 120px; }
-    label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px; color: #495057; }
-    input, select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+    /* 입력 폼 카드 */
+    .input-card { background: var(--gray-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 16px; }
     
-    .btn-group { display: flex; gap: 8px; margin-top: 8px; }
-    button { padding: 10px 16px; border: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-save { background: var(--primary); color: #fff; flex: 2; }
-    .btn-print { background: #2f9e44; color: #fff; flex: 1; }
+    .form-group { margin-bottom: 12px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    
+    input[type="date"], input[type="number"], input[type="text"], select {
+      width: 100%; height: 42px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fff; color: #000;
+    }
+    input[type="number"] { text-align: center; font-weight: 600; }
+    input::placeholder { color: #adb5bd; font-weight: normal; font-size: 0.85rem; }
+
+    .bp-input-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+    /* 버튼 그룹 */
+    .btn-main-wrap { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .btn-sub-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    
+    button {
+      height: 44px; border: none; border-radius: 8px; font-size: 0.92rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.15s; white-space: nowrap;
+    }
+    button:active { transform: scale(0.98); }
+    .btn-save { background: var(--primary); color: #fff; width: 100%; font-size: 1rem; }
+    .btn-print { background: var(--success); color: #fff; }
     .btn-export { background: #495057; color: #fff; }
 
-    /* 요약 정보 바 */
-    .summary-bar { display: flex; justify-content: space-between; background: #e7f5ff; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem; border: 1px solid #a5d8ff; }
-    .summary-bar strong { color: var(--primary); }
+    /* 요약 카드 그리드 (글자 겹침 방지) */
+    .summary-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; background: #e7f5ff; border: 1px solid #a5d8ff; border-radius: 10px; padding: 10px 8px; margin-bottom: 16px; text-align: center;
+    }
+    .summary-item { display: flex; flex-direction: column; gap: 2px; }
+    .summary-label { font-size: 0.72rem; color: #1c7ed6; font-weight: 600; }
+    .summary-val { font-size: 0.92rem; font-weight: 800; color: #1864ab; }
 
-    /* 테이블 영역 */
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
-    th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
-    th { background: #f1f3f5; color: #495057; }
-    .badge-warn { color: var(--danger); font-weight: bold; background: #ffe3e3; padding: 2px 6px; border-radius: 4px; }
-    .badge-ok { color: #2b8a3e; }
-    .btn-del { background: none; border: none; color: #adb5bd; cursor: pointer; font-size: 0.8rem; }
-    .btn-del:hover { color: var(--danger); }
+    /* 테이블 영역 (모바일 가로 스크롤 보장) */
+    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 580px; background: #fff; }
+    th, td { border-bottom: 1px solid var(--border); border-right: 1px solid #f1f3f5; padding: 10px 6px; text-align: center; white-space: nowrap; }
+    th:last-child, td:last-child { border-right: none; }
+    th { background: #f1f3f5; color: #495057; font-weight: 700; }
+    tbody tr:last-child td { border-bottom: none; }
+    
+    .badge-warn { color: #fff; font-weight: 700; background: var(--danger); padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; }
+    .badge-ok { color: var(--success); font-weight: 700; background: #ebfbee; padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; }
+    .btn-del { background: #f8f9fa; border: 1px solid #ced4da; color: #868e96; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; height: auto; }
+    .btn-del:active { background: #ffe3e3; color: var(--danger); border-color: var(--danger); }
 
     /* ========================================================
        인쇄 및 PDF 저장 전용 스타일 (@media print)
@@ -65,13 +93,18 @@
     @media print {
       body { background: #fff; padding: 0; color: #000; }
       .container { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
-      .input-card, .btn-group, .btn-del, .no-print { display: none !important; }
+      .input-card, .btn-main-wrap, .btn-del, .no-print { display: none !important; }
       h1 { font-size: 1.6rem; margin-bottom: 4px; }
-      .subtitle { margin-bottom: 15px; }
-      .summary-bar { background: none; border: 1px solid #333; margin-bottom: 12px; }
-      table { font-size: 9pt; }
-      th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .badge-warn { background: none; color: #000; text-decoration: underline; font-weight: bold; }
+      .subtitle { margin-bottom: 12px; }
+      .summary-grid { background: none; border: 1px solid #333; margin-bottom: 12px; }
+      .summary-label { color: #333; }
+      .summary-val { color: #000; }
+      .table-container { border: 1px solid #000; overflow: visible; }
+      table { min-width: 100%; font-size: 9pt; }
+      th { background: #e9ecef !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #000; }
+      th, td { border: 1px solid #999; padding: 6px 4px; }
+      .badge-warn { background: none; color: #000; text-decoration: underline; font-weight: 900; }
+      .badge-ok { background: none; color: #000; }
     }
   </style>
 </head>
@@ -79,91 +112,111 @@
 
 <div class="container">
   <h1>가정 혈압 측정 기록부</h1>
-  <div class="subtitle">대한고혈압학회 표준 가이드라인 (기준치: 135 / 85 mmHg)</div>
+  <div class="subtitle">대한고혈압학회 기준 (정상: 135 / 85 mmHg 미만)</div>
 
-  <!-- 입력 폼 (인쇄 시 자동 숨김) -->
+  <!-- 입력 폼 -->
   <div class="input-card">
-    <div class="row">
-      <div class="col">
-        <label>측정 일자</label>
+    <!-- 날짜 & 구분 -->
+    <div class="form-group grid-2">
+      <div>
+        <label class="form-label">측정 일자</label>
         <input type="date" id="date">
       </div>
-      <div class="col">
-        <label>구분</label>
+      <div>
+        <label class="form-label">측정 시점</label>
         <select id="period">
-          <option value="아침">아침 (기상 후 1시간 내, 식전)</option>
+          <option value="아침">아침 (기상 후)</option>
           <option value="저녁">저녁 (취침 전)</option>
         </select>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <label>1차 수축기/이완기</label>
-        <div style="display:flex; gap:4px;">
-          <input type="number" id="sys1" placeholder="수축기(120)">
-          <input type="number" id="dia1" placeholder="이완기(80)">
-        </div>
-      </div>
-      <div class="col">
-        <label>2차 수축기/이완기 (1분 뒤)</label>
-        <div style="display:flex; gap:4px;">
-          <input type="number" id="sys2" placeholder="수축기(118)">
-          <input type="number" id="dia2" placeholder="이완기(78)">
-        </div>
-      </div>
-      <div class="col" style="max-width: 100px;">
-        <label>맥박(회/분)</label>
-        <input type="number" id="pulse" placeholder="70">
+
+    <!-- 1차 측정 -->
+    <div class="form-group">
+      <label class="form-label">1차 혈압 (수축기 / 이완기)</label>
+      <div class="bp-input-wrap">
+        <input type="number" id="sys1" placeholder="수축기 (예: 120)" inputmode="numeric">
+        <input type="number" id="dia1" placeholder="이완기 (예: 80)" inputmode="numeric">
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <label>특이사항 (메모)</label>
-        <input type="text" id="memo" placeholder="예: 두통 있음, 기상 직후, 음주 다음 날 등">
+
+    <!-- 2차 측정 & 맥박 -->
+    <div class="form-group grid-2">
+      <div>
+        <label class="form-label">2차 혈압 (1분 뒤)</label>
+        <div class="bp-input-wrap">
+          <input type="number" id="sys2" placeholder="수축기" inputmode="numeric">
+          <input type="number" id="dia2" placeholder="이완기" inputmode="numeric">
+        </div>
+      </div>
+      <div>
+        <label class="form-label">맥박 (bpm)</label>
+        <input type="number" id="pulse" placeholder="예: 70" inputmode="numeric">
       </div>
     </div>
-    <div class="btn-group">
+
+    <!-- 메모 -->
+    <div class="form-group">
+      <label class="form-label">특이사항 (선택)</label>
+      <input type="text" id="memo" placeholder="예: 기상 직후, 약간 긴장됨, 두통 등">
+    </div>
+
+    <!-- 버튼 -->
+    <div class="btn-main-wrap">
       <button class="btn-save" onclick="saveRecord()">기록 저장하기</button>
-      <button class="btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
-      <button class="btn-export" onclick="exportCSV()">CSV 내보내기</button>
+      <div class="btn-sub-wrap">
+        <button class="btn-print" onclick="window.print()">인쇄 / PDF 저장</button>
+        <button class="btn-export" onclick="exportCSV()">CSV 내보내기</button>
+      </div>
     </div>
   </div>
 
-  <!-- 통계 요약 바 -->
-  <div class="summary-bar" id="summaryBar">
-    <span>전체 기록 건수: <strong id="totalCount">0</strong>건</span>
-    <span>평균 가정 혈압: <strong id="avgBP">- / -</strong> mmHg</span>
-    <span>평균 맥박: <strong id="avgPulse">-</strong> bpm</span>
+  <!-- 통계 요약 (그리드 카드) -->
+  <div class="summary-grid">
+    <div class="summary-item">
+      <span class="summary-label">총 기록</span>
+      <span class="summary-val" id="totalCount">0건</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">평균 가정 혈압</span>
+      <span class="summary-val" id="avgBP">- / -</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">평균 맥박</span>
+      <span class="summary-val" id="avgPulse">- bpm</span>
+    </div>
   </div>
 
-  <!-- 기록 테이블 -->
-  <table>
-    <thead>
-      <tr>
-        <th>측정 일시</th>
-        <th>구분</th>
-        <th>1차 (수축/이완)</th>
-        <th>2차 (수축/이완)</th>
-        <th>평균 혈압</th>
-        <th>맥박</th>
-        <th>판정</th>
-        <th>특이사항</th>
-        <th class="no-print">관리</th>
-      </tr>
-    </thead>
-    <tbody id="recordBody"></tbody>
-  </table>
+  <!-- 기록 테이블 (가로 스크롤 지원) -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>일시</th>
+          <th>시점</th>
+          <th>1차 (수/이)</th>
+          <th>2차 (수/이)</th>
+          <th>평균 혈압</th>
+          <th>맥박</th>
+          <th>판정</th>
+          <th>메모</th>
+          <th class="no-print">관리</th>
+        </tr>
+      </thead>
+      <tbody id="recordBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
   const STORAGE_KEY = 'home_bp_records_v1';
 
-  // 페이지 로드 시 초기화
   window.onload = function() {
     const today = new Date();
-    document.getElementById('date').value = today.toISOString().split('T')[0];
+    // 로컬 시간 기준 YYYY-MM-DD
+    const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+    document.getElementById('date').value = localDate;
     
-    // 12시 이전이면 아침, 이후면 저녁 기본 설정
     const hours = today.getHours();
     document.getElementById('period').value = (hours >= 4 && hours < 12) ? '아침' : '저녁';
     
@@ -185,11 +238,10 @@
     const memo = document.getElementById('memo').value.trim();
 
     if (!date || isNaN(s1) || isNaN(d1)) {
-      alert('측정 일자와 1차 혈압(수축기/이완기)을 올바르게 입력해주세요.');
+      alert('측정 일자와 1차 혈압(수축기/이완기)을 입력해주세요.');
       return;
     }
 
-    // 2차가 없으면 1차 값으로 평균 처리
     const avgSys = isNaN(s2) ? s1 : Math.round((s1 + s2) / 2);
     const avgDia = isNaN(d2) ? d1 : Math.round((d1 + d2) / 2);
 
@@ -207,11 +259,10 @@
 
     const records = getRecords();
     records.push(record);
-    // 날짜 역순(최신순) 정렬
     records.sort((a, b) => new Date(b.date) - new Date(a.date));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 
-    // 입력 필드 초기화
+    // 폼 초기화
     document.getElementById('sys1').value = '';
     document.getElementById('dia1').value = '';
     document.getElementById('sys2').value = '';
@@ -235,10 +286,10 @@
     tbody.innerHTML = '';
 
     if (records.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="padding:20px; color:#868e96;">저장된 측정 데이터가 없습니다.</td></tr>';
-      document.getElementById('totalCount').innerText = '0';
+      tbody.innerHTML = '<tr><td colspan="9" style="padding:24px; color:#868e96; white-space:normal;">저장된 측정 데이터가 없습니다.</td></tr>';
+      document.getElementById('totalCount').innerText = '0건';
       document.getElementById('avgBP').innerText = '- / -';
-      document.getElementById('avgPulse').innerText = '-';
+      document.getElementById('avgPulse').innerText = '- bpm';
       return;
     }
 
@@ -252,38 +303,37 @@
         validPulseCount++;
       }
 
-      // 가정 혈압 기준 135/85 판정
       const isHigh = r.avgSys >= 135 || r.avgDia >= 85;
       const statusHtml = isHigh 
-        ? `<span class="badge-warn">주의 (기준초과)</span>` 
+        ? `<span class="badge-warn">주의</span>` 
         : `<span class="badge-ok">정상</span>`;
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${r.date}</td>
+        <td>${r.date.slice(5)}</td>
         <td>${r.period}</td>
-        <td>${r.sys1} / ${r.dia1}</td>
-        <td>${r.sys2 !== '-' ? `${r.sys2} /${r.dia2}` : '-'}</td>
-        <td style="font-weight:bold;">${r.avgSys} / ${r.avgDia}</td>
-        <td>${r.pulse ? `${r.pulse} 회` : '-'}</td>
+        <td>${r.sys1}/${r.dia1}</td>
+        <td>${r.sys2 !== '-' ? `${r.sys2}/${r.dia2}` : '-'}</td>
+        <td style="font-weight:700;">${r.avgSys}/${r.avgDia}</td>
+        <td>${r.pulse ? `${r.pulse}` : '-'}</td>
         <td>${statusHtml}</td>
-        <td style="text-align:left;">${r.memo}</td>
+        <td style="text-align:left; max-width:120px; overflow:hidden; text-overflow:ellipsis;">${r.memo || '-'}</td>
         <td class="no-print"><button class="btn-del" onclick="deleteRecord(${r.id})">삭제</button></td>
       `;
       tbody.appendChild(tr);
     });
 
     const total = records.length;
-    document.getElementById('totalCount').innerText = total;
+    document.getElementById('totalCount').innerText = `${total}건`;
     document.getElementById('avgBP').innerText = `${Math.round(sumSys / total)} / ${Math.round(sumDia / total)}`;
-    document.getElementById('avgPulse').innerText = validPulseCount ? Math.round(sumPulse / validPulseCount) : '-';
+    document.getElementById('avgPulse').innerText = validPulseCount ? `${Math.round(sumPulse / validPulseCount)} bpm` : '-';
   }
 
   function exportCSV() {
     const records = getRecords();
     if (!records.length) return alert('내보낼 데이터가 없습니다.');
     
-    let csv = '\uFEFF날짜,구분,1차_수축기,1차_이완기,2차_수축기,2차_이완기,평균_수축기,평균_이완기,맥박,특이사항\n';
+    let csv = '\uFEFF날짜,시점,1차수축,1차이완,2차수축,2차이완,평균수축,평균이완,맥박,특이사항\n';
     records.forEach(r => {
       csv += `${r.date},${r.period},${r.sys1},${r.dia1},${r.sys2},${r.dia2},${r.avgSys},${r.avgDia},${r.pulse},"${r.memo}"\n`;
     });
@@ -291,7 +341,7 @@
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `가정혈압기록_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `혈압기록_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
   }
 </script>
