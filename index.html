@@ -71,11 +71,13 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     
     input[type="date"], input[type="number"], input[type="text"], select {
-      width: 100%; height: 42px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fff; color: #000;
+      width: 100%; height: 42px; padding: 0 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fff; color: #000;
     }
     input[type="number"] { text-align: center; font-weight: 600; }
-    input::placeholder { color: #adb5bd; font-weight: normal; font-size: 0.85rem; }
-    .bp-input-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    input::placeholder { color: #adb5bd; font-weight: normal; font-size: 0.8rem; }
+    
+    /* 혈압 3열 그리드 (수축기 / 이완기 / 맥박) */
+    .bp-input-wrap { display: grid; grid-template-columns: 1.2fr 1.2fr 1fr; gap: 6px; }
 
     /* 버튼 그룹 */
     .btn-main-wrap { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
@@ -202,25 +204,23 @@
       </div>
     </div>
 
+    <!-- 1차 측정 (수축기 / 이완기 / 맥박) -->
     <div class="form-group">
-      <label class="form-label">1차 혈압 (수축기 / 이완기)</label>
+      <label class="form-label">1차 혈압 (수축기 / 이완기 / 맥박)</label>
       <div class="bp-input-wrap">
-        <input type="number" id="sys1" placeholder="수축기 (예: 120)" inputmode="numeric">
-        <input type="number" id="dia1" placeholder="이완기 (예: 80)" inputmode="numeric">
+        <input type="number" id="sys1" placeholder="수축기" inputmode="numeric">
+        <input type="number" id="dia1" placeholder="이완기" inputmode="numeric">
+        <input type="number" id="pulse1" placeholder="맥박(선택)" inputmode="numeric">
       </div>
     </div>
 
-    <div class="form-group grid-2">
-      <div>
-        <label class="form-label">2차 혈압 (1분 쉬고)</label>
-        <div class="bp-input-wrap">
-          <input type="number" id="sys2" placeholder="수축기" inputmode="numeric">
-          <input type="number" id="dia2" placeholder="이완기" inputmode="numeric">
-        </div>
-      </div>
-      <div>
-        <label class="form-label">맥박 (bpm)</label>
-        <input type="number" id="pulse" placeholder="예: 70" inputmode="numeric">
+    <!-- 2차 측정 (수축기 / 이완기 / 맥박) -->
+    <div class="form-group">
+      <label class="form-label">2차 혈압 (1분 뒤: 수축기 / 이완기 / 맥박)</label>
+      <div class="bp-input-wrap">
+        <input type="number" id="sys2" placeholder="수축기" inputmode="numeric">
+        <input type="number" id="dia2" placeholder="이완기" inputmode="numeric">
+        <input type="number" id="pulse2" placeholder="맥박(선택)" inputmode="numeric">
       </div>
     </div>
 
@@ -295,7 +295,7 @@
 <script>
   const STORAGE_KEY = 'home_bp_records_v1';
   let chartInstance = null;
-  let currentFilter = 'all'; // 7, 14, 30, 'all'
+  let currentFilter = 'all';
 
   window.onload = function() {
     resetDateToToday();
@@ -342,9 +342,10 @@
     const period = document.getElementById('period').value;
     const s1 = parseInt(document.getElementById('sys1').value);
     const d1 = parseInt(document.getElementById('dia1').value);
+    const p1 = parseInt(document.getElementById('pulse1').value);
     const s2 = parseInt(document.getElementById('sys2').value);
     const d2 = parseInt(document.getElementById('dia2').value);
-    const pulse = parseInt(document.getElementById('pulse').value) || 0;
+    const p2 = parseInt(document.getElementById('pulse2').value);
     const memo = document.getElementById('memo').value.trim();
 
     if (!date || isNaN(s1) || isNaN(d1)) {
@@ -355,10 +356,19 @@
     const avgSys = isNaN(s2) ? s1 : Math.round((s1 + s2) / 2);
     const avgDia = isNaN(d2) ? d1 : Math.round((d1 + d2) / 2);
 
+    // 맥박 계산: 둘 다 있으면 평균, 하나만 있으면 그 값, 없으면 0
+    let avgPulse = 0;
+    if (!isNaN(p1) && !isNaN(p2)) {
+      avgPulse = Math.round((p1 + p2) / 2);
+    } else if (!isNaN(p2)) {
+      avgPulse = p2;
+    } else if (!isNaN(p1)) {
+      avgPulse = p1;
+    }
+
     let records = getRecords();
 
     if (editId) {
-      // 수정 모드
       const index = records.findIndex(r => r.id === parseInt(editId));
       if (index !== -1) {
         records[index] = {
@@ -366,25 +376,28 @@
           date,
           period,
           sys1: s1, dia1: d1,
+          pulse1: isNaN(p1) ? '' : p1,
           sys2: isNaN(s2) ? '-' : s2,
           dia2: isNaN(d2) ? '-' : d2,
+          pulse2: isNaN(p2) ? '' : p2,
           avgSys, avgDia,
-          pulse,
+          pulse: avgPulse,
           memo
         };
       }
       cancelEdit();
     } else {
-      // 신규 등록 모드
       const record = {
         id: Date.now(),
         date,
         period,
         sys1: s1, dia1: d1,
+        pulse1: isNaN(p1) ? '' : p1,
         sys2: isNaN(s2) ? '-' : s2,
         dia2: isNaN(d2) ? '-' : d2,
+        pulse2: isNaN(p2) ? '' : p2,
         avgSys, avgDia,
-        pulse,
+        pulse: avgPulse,
         memo
       };
       records.push(record);
@@ -406,9 +419,10 @@
     document.getElementById('period').value = record.period;
     document.getElementById('sys1').value = record.sys1;
     document.getElementById('dia1').value = record.dia1;
+    document.getElementById('pulse1').value = record.pulse1 || '';
     document.getElementById('sys2').value = record.sys2 === '-' ? '' : record.sys2;
     document.getElementById('dia2').value = record.dia2 === '-' ? '' : record.dia2;
-    document.getElementById('pulse').value = record.pulse ? record.pulse : '';
+    document.getElementById('pulse2').value = record.pulse2 || (record.pulse ? record.pulse : '');
     document.getElementById('memo').value = record.memo;
 
     document.getElementById('inputCard').classList.add('edit-mode');
@@ -439,9 +453,10 @@
   function clearForm() {
     document.getElementById('sys1').value = '';
     document.getElementById('dia1').value = '';
+    document.getElementById('pulse1').value = '';
     document.getElementById('sys2').value = '';
     document.getElementById('dia2').value = '';
-    document.getElementById('pulse').value = '';
+    document.getElementById('pulse2').value = '';
     document.getElementById('memo').value = '';
   }
 
